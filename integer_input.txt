@@ -1,0 +1,7 @@
+FME_type: integer
+dimensions: 3 2
+
+# Inequalities in the form Ax <= b
+row_1: 1 1 5
+row_2: -1 1 1
+row_3: 0 -1 0

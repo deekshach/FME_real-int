@@ -1,0 +1,40 @@
+This is a Fourier-Motzkin Elimination Solver that solves both real and integer implementation of the algorithm. 
+
+STEPS TO RUN:
+1. In order to compile the program: make
+2. In order to run the:
+    2.1. real version: ./fme --input=real_input.txt --output=output.txt
+    2.2. integer version: ./fme --input=integer_input.txt --output=output.txt
+
+FORMAT OF THE INPUT FILE:
+1. Real:
+    FME_type: real
+    dimensions: 3 2
+    
+    #Below are in the form Ax <= b
+    row_1: 1 1 5
+    row_2: -1 1 1
+    row_3: 0 -1 0
+
+
+2. Integer:
+    
+    FME_type: integer
+    dimensions: 3 2
+
+    #Below are in the form Ax <= b
+    row_1: 1 1 5
+    row_2: -1 1 1
+    row_3: 0 -1 0
+
+
+
+FILE STRUCTURE:
+main.cpp: Orchestration of FME
+system_types.h: Data structure definition
+real_fme.cpp: Implements real value FME
+real_fme.h: Function declaration for real FME
+integer_fme.cpp: Implements integer value FME
+integer_fme.h: Function declaration for integer value FME
+system_reader.cpp: Handles file parsing
+system_reader.h: Function declaration for system_reader.cpp

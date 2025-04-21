@@ -1,0 +1,13 @@
+Processing real-valued system with 3 inequalities and 2 variables
+
+System of inequalities:
+1x0 + 1x1 <= 5
+-1x0 + 1x1 <= 1
+0x0 -1x1 <= 0
+
+Starting real-valued FME process...
+
+Eliminating variable x0
+Eliminating variable x1
+
+Real-valued system has solution: YES
