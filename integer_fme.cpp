@@ -141,21 +141,23 @@ void generateLoopNest(IntSystem sys)      //loop nest print
     
     int lowerBounds[MAX_COLS];
     int upperBounds[MAX_COLS];
-    bool hasBounds[MAX_COLS];
+    bool hasLowerBound[MAX_COLS];
+    bool hasUpperBound[MAX_COLS];
     
     for (int i = 0; i < sys.cols; i++) 
     {
-        lowerBounds[i]=-1000;  // Def lower bound
-        upperBounds[i]=1000;   // def upper bnd
-        hasBounds[i]=false;
+        lowerBounds[i]=0;     // def lower bopund
+        upperBounds[i]=10;    // default upper bnd
+        hasLowerBound[i]=false;
+        hasUpperBound[i]=false;
     }
     
     
     for (int i=0;i<sys.rows; i++) 
     {
         
-        int nonZeroCount = 0;
-        int nonZeroIndex = -1;
+        int nonZeroCount=0;
+        int nonZeroIndex=-1;
         
         for (int j=0; j<sys.cols; j++) 
         {
@@ -163,8 +165,7 @@ void generateLoopNest(IntSystem sys)      //loop nest print
             {
                 nonZeroCount++;
                 nonZeroIndex = j;
-            }
-        }
+            }}
         
         
         if (nonZeroCount == 1)    //if only 1 var
@@ -176,22 +177,55 @@ void generateLoopNest(IntSystem sys)      //loop nest print
             {
                 
                 int bound = rhs/ coefficient;
-                if (!hasBounds[nonZeroIndex] || bound < upperBounds[nonZeroIndex]) 
+                if (!hasUpperBound[nonZeroIndex] || bound < upperBounds[nonZeroIndex]) 
                 {
                     upperBounds[nonZeroIndex]=bound;
-                    hasBounds[nonZeroIndex]=true;
+                    hasUpperBound[nonZeroIndex]=true;
                 }
             } 
             else if (coefficient<0) 
             {
             
-                int bound = rhs/coefficient;
-                if (!hasBounds[nonZeroIndex] || bound > lowerBounds[nonZeroIndex]) 
+                int bound = -(rhs/coefficient);
+                if (!hasLowerBound[nonZeroIndex] || bound > lowerBounds[nonZeroIndex]) 
                 {
                     lowerBounds[nonZeroIndex] = bound;
-                    hasBounds[nonZeroIndex] = true;
+                    hasLowerBound[nonZeroIndex] = true;
                 }
-            }}}
+            }
+        }
+        
+        
+        if (nonZeroCount == 2)    //2-var ineq
+        {
+            int firstVar = -1, secondVar = -1;
+            for (int j=0; j<sys.cols; j++) 
+            {
+                if (sys.A[i][j]!=0) 
+                {
+                    if (firstVar == -1) firstVar = j;
+                    else secondVar = j;
+                }
+            }
+            
+            int a = sys.A[i][firstVar];
+            int b = sys.A[i][secondVar];
+            int rhs = sys.b[i];
+            
+        
+            if (abs(a) == 1 && abs(b) == 1) 
+            {
+                if (a > 0 && !hasUpperBound[firstVar]) 
+                {
+                    upperBounds[firstVar]=rhs;
+                    hasUpperBound[firstVar]=true;
+                }
+                if (b > 0 && !hasUpperBound[secondVar]) 
+                {
+                    upperBounds[secondVar] = rhs;
+                    hasUpperBound[secondVar] = true;
+                }
+}}}
     
     
     for (int var=0; var<sys.cols; var++) 
@@ -201,14 +235,29 @@ void generateLoopNest(IntSystem sys)      //loop nest print
             cout << "    ";
         }
         
-        if (hasBounds[var]) {
-            cout << "for (int x" << var << " = " << lowerBounds[var] 
-                 << "; x" << var << " <= " << upperBounds[var] 
-                 << "; x" << var << "++) {" << endl;
-        } else {
-            cout << "for (int x" << var << " = /* unbound lower */; x" << var 
-                 << " <= /* unbound upper */; x" << var << "++) {" << endl;
+        cout << "for (int x" << var << " = ";
+        
+        if (hasLowerBound[var]) 
+        {
+            cout << lowerBounds[var];
+        } 
+        else 
+        {
+            cout << "0";  //default lower bound
         }
+        
+        cout << "; x" << var << " <= ";
+        
+        if (hasUpperBound[var]) 
+        {
+            cout << upperBounds[var];
+        } 
+        else 
+        {
+            cout << "10";  //default upper bnd
+        }
+        
+        cout << "; x" << var << "++) {" << endl;
         
         if (!sys.isExact[var]) 
         {
@@ -216,7 +265,7 @@ void generateLoopNest(IntSystem sys)      //loop nest print
             {
                 cout << "    ";
             }
-            cout << "// Warning: Projection for x" << var << " was inexact" << endl;
+            cout << "// PS: Projection for x" << var << " was inexact" << endl;
         }}
     
     
@@ -249,8 +298,7 @@ void generateLoopNest(IntSystem sys)      //loop nest print
             cout << "    ";
         }
         cout << "}" << endl;
-    }
-}
+    }}
 
 
 void solveIntegerFME(IntSystem sys) 
