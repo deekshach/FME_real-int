@@ -48,7 +48,7 @@ string getFmeTypeFromConfig(const string& filename)     //getting config from co
                 return value;
             }
         
-        }}
+}}
     
     return "";
 }
@@ -68,7 +68,7 @@ void printUsage()
     cout << "  row_1: a11 a12 ... a1n b1" << endl;
     cout << "  row_2: a21 a22 ... a2n b2" << endl;
     cout << endl;
-    cout << "Example: ./fme --input=my_system.txt --output=results.txt" << endl;
+    cout << "Example: ./fme --input=integer_input.txt --output=results.txt" << endl;
     
     cout << "===================================================================" << endl;
 }
@@ -94,20 +94,23 @@ int main(int argc, char* argv[])
         {
             inputFile = arg.substr(8);
         }
+        
         else if (arg.substr(0,9)== "--output=") 
         {
             outputFile = arg.substr(9);
         }
+        
         else 
         {
-            cout<<"Unknown option: "<< arg <<endl;
+            cout<<"Gee! I don't know this option: "<< arg <<endl;
+            cout<<"Can you input an option which is present in my configuration?"<<endl;
             
             printUsage();
             return 1;
         }}
     
 
-    string fmeType = getFmeTypeFromConfig(inputFile);    //type of fme from cfg file
+    string fmeType = getFmeTypeFromConfig(inputFile);    //type of fme from input file
     if (fmeType.empty()) 
     {
         cout << "Error: write something in the fme_type, no!" << endl;
@@ -119,13 +122,13 @@ int main(int argc, char* argv[])
     
     for (char &c : fmeType) 
     {
-        c = tolower(c);    //making lower case
+    c = tolower(c);    //making lower case
     }
     
     
-    if (fmeType != "real" && fmeType != "integer") 
+    if (fmeType!="real" && fmeType!="integer") 
     {
-        cout << "Error: FME type must be 'real' or 'integer', got '" << fmeType << "'" << endl;
+        cout<<"Error: FME type must be 'real' or 'integer', got '"<<fmeType<<"'"<<endl;
         
         printUsage();
         return 1;
@@ -135,7 +138,7 @@ int main(int argc, char* argv[])
     ofstream outFile(outputFile);    //output file
     if (!outFile.is_open()) 
     {
-        cout << "Error: Cannot open output file " << outputFile << endl;
+        cout<<"Error: Cannot open output file "<<outputFile<<endl;
         return 1;
     }
     
@@ -144,26 +147,26 @@ int main(int argc, char* argv[])
     cout.rdbuf(outFile.rdbuf());
     
     
-    if (fmeType == "real") 
+    if (fmeType=="real") 
     {
         System sys;
-        if (!readSystem(inputFile, sys)) 
+        if (!readSystem(inputFile,sys)) 
         {
             
             cout.rdbuf(oldCoutBuf);
-            cout << "Error reading input file." << endl;
+            cout<<"Error reading input file."<<endl;
             return 1;
         }
         
         
-        cout << "Processing real-valued system with " << sys.rows << " inequalities and " << sys.cols << " variables" << endl << endl;   //system configs
+        cout<<"Processing real-valued system with "<<sys.rows<<" inequalities and "<<sys.cols<<" variables"<<endl<<endl;   //system configs
         
         
         printSystem(sys);  //printing initial system
         
         
         bool hasSolution = solveFME(sys);
-        cout << endl << "Real-valued system has solution: " << (hasSolution ? "YES" : "NO") << endl;
+        cout<<endl<<"Real-valued system has solution: " <<(hasSolution ? "YES" : "NO")<<endl;
     }
     
     else 
@@ -173,12 +176,12 @@ int main(int argc, char* argv[])
         {
         
             cout.rdbuf(oldCoutBuf);
-            cout << "Error reading input file." << endl;
+            cout<<"Error reading input file."<<endl;
             return 1;
         }
         
         
-        cout << "Processing integer valued system with "<<sys.rows<<" inequalities and " << sys.cols << " variables" << endl << endl;   //system inmfo
+        cout<<"Processing integer valued system with "<<sys.rows<<" inequalities and "<<sys.cols<<" variables"<<endl<<endl;   //system inmfo
         
     
         printIntSystem(sys);   //system
@@ -189,7 +192,7 @@ int main(int argc, char* argv[])
     
 
     cout.rdbuf(oldCoutBuf);
-    cout << "Results written to " << outputFile << endl;
+    cout<<"Results written to "<<outputFile<<endl;
     
     return 0;
 }
