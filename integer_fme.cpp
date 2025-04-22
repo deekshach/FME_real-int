@@ -139,7 +139,7 @@ void generateLoopNest(IntSystem sys)      //loop nest print
 {
     cout<<endl<<"Loop nest for solution space:"<<endl<<endl;
     
-    int lowerBounds[MAX_COLS];
+    int lowerBounds[MAX_COLS];     //separate bound arrays
     int upperBounds[MAX_COLS];
     bool hasLowerBound[MAX_COLS];
     bool hasUpperBound[MAX_COLS];
@@ -153,7 +153,7 @@ void generateLoopNest(IntSystem sys)      //loop nest print
     }
     
     
-    for (int i=0;i<sys.rows; i++) 
+    for (int i=0;i<sys.rows; i++)       //counting non-zero coefficients in ineq 
     {
         
         int nonZeroCount=0;
@@ -196,26 +196,27 @@ void generateLoopNest(IntSystem sys)      //loop nest print
         }
         
         
-        if (nonZeroCount == 2)    //2-var ineq
+        if (nonZeroCount==2)    //2-var ineq
         {
-            int firstVar = -1, secondVar = -1;
+            int firstVar =-1, secondVar =-1;
             for (int j=0; j<sys.cols; j++) 
             {
                 if (sys.A[i][j]!=0) 
                 {
-                    if (firstVar == -1) firstVar = j;
-                    else secondVar = j;
-                }
-            }
+                    if (firstVar==-1) 
+                        firstVar = j;
+                    else 
+                        secondVar = j;
+                }}
             
-            int a = sys.A[i][firstVar];
-            int b = sys.A[i][secondVar];
-            int rhs = sys.b[i];
+            int a=sys.A[i][firstVar];
+            int b=sys.A[i][secondVar];
+            int rhs=sys.b[i];
             
         
-            if (abs(a) == 1 && abs(b) == 1) 
+            if (abs(a)==1 && abs(b)==1) 
             {
-                if (a > 0 && !hasUpperBound[firstVar]) 
+                if (a>0 && !hasUpperBound[firstVar]) 
                 {
                     upperBounds[firstVar]=rhs;
                     hasUpperBound[firstVar]=true;
