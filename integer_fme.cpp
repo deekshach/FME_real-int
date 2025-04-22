@@ -137,7 +137,62 @@ for(int i=0; i<sys.rows; i++)          //separate rows for their sign
 
 void generateLoopNest(IntSystem sys)      //loop nest print
 {
-    cout << endl << "Loop nest for solution space:" << endl << endl;
+    cout<<endl<<"Loop nest for solution space:"<<endl<<endl;
+    
+    int lowerBounds[MAX_COLS];
+    int upperBounds[MAX_COLS];
+    bool hasBounds[MAX_COLS];
+    
+    for (int i = 0; i < sys.cols; i++) 
+    {
+        lowerBounds[i]=-1000;  // Def lower bound
+        upperBounds[i]=1000;   // def upper bnd
+        hasBounds[i]=false;
+    }
+    
+    
+    for (int i=0;i<sys.rows; i++) 
+    {
+        
+        int nonZeroCount = 0;
+        int nonZeroIndex = -1;
+        
+        for (int j=0; j<sys.cols; j++) 
+        {
+            if (sys.A[i][j]!=0) 
+            {
+                nonZeroCount++;
+                nonZeroIndex = j;
+            }
+        }
+        
+        
+        if (nonZeroCount == 1)    //if only 1 var
+        {
+            int coefficient=sys.A[i][nonZeroIndex];
+            int rhs=sys.b[i];
+            
+            if (coefficient>0) 
+            {
+                
+                int bound = rhs/ coefficient;
+                if (!hasBounds[nonZeroIndex] || bound < upperBounds[nonZeroIndex]) 
+                {
+                    upperBounds[nonZeroIndex]=bound;
+                    hasBounds[nonZeroIndex]=true;
+                }
+            } 
+            else if (coefficient<0) 
+            {
+            
+                int bound = rhs/coefficient;
+                if (!hasBounds[nonZeroIndex] || bound > lowerBounds[nonZeroIndex]) 
+                {
+                    lowerBounds[nonZeroIndex] = bound;
+                    hasBounds[nonZeroIndex] = true;
+                }
+            }}}
+    
     
     for (int var=0; var<sys.cols; var++) 
     {
@@ -146,7 +201,14 @@ void generateLoopNest(IntSystem sys)      //loop nest print
             cout << "    ";
         }
         
-        cout << "for (int x" << var << " = /* lower bound */; x" << var << " <= /* upper bound */; x" << var << "++) {" << endl;
+        if (hasBounds[var]) {
+            cout << "for (int x" << var << " = " << lowerBounds[var] 
+                 << "; x" << var << " <= " << upperBounds[var] 
+                 << "; x" << var << "++) {" << endl;
+        } else {
+            cout << "for (int x" << var << " = /* unbound lower */; x" << var 
+                 << " <= /* unbound upper */; x" << var << "++) {" << endl;
+        }
         
         if (!sys.isExact[var]) 
         {
